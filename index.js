@@ -41,8 +41,8 @@ TO DO: ([-todo] [+complete])
     - extend to have complete CRUD
     + create book
     + read book database
-    - update book
-    - delete book
+    + update book
+    + delete book
   - Move to POSTMAN
   -test all petitions
     -GET BY ID

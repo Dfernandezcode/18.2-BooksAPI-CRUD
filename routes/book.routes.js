@@ -5,13 +5,34 @@ const { Book } = require("../models/Book.js");
 // Routers - book only.
 const router = express.Router();
 
-// ROUTES
-
 // Home Route: - CRUD: READ
 router.get("/", async (req, res) => {
+  // How to read query.params
+  console.log(req.query);
   try {
-    const books = await Book.find();
-    res.json(books);
+    // Asi leemos query params
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const books = await Book.find()
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    // LIMIT 10, PAGE 1 -> SKIP = 0
+    // LIMIT 10, PAGE 2 -> SKIP = 10
+    // LIMIT 10, PAGE 3 -> SKIP = 20
+    // ...
+
+    // Num total de elementos
+    const totalElements = await Book.countDocuments();
+
+    const response = {
+      totalItems: totalElements,
+      totalPages: Math.ceil(totalElements / limit),
+      currentPage: page,
+      data: books,
+    };
+
+    res.json(response);
   } catch (error) {
     res.status(500).json(error);
   }
@@ -24,22 +45,23 @@ router.get("/book", (req, res) => {
     .catch((error) => res.status(500).json(error));
 });
 
-router.get("/book/:id", (req, res) => {
-  const id = req.params.id;
-
-  Book.findById(id)
-    .then((book) => {
-      if (book) {
-        res.json(book);
-      } else {
-        res.status(404).json({});
-      }
-    })
-    .catch((error) => res.status(500).json(error));
+// get by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const book = await Book.findById(id);
+    if (book) {
+      res.json(book);
+    } else {
+      res.status(404).json({});
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
 });
 
-// search by title (or other parameter): - CRUD: Custom Operation.
-router.get("/book/title/:title", async (req, res) => {
+// get by Title
+router.get("/title/:title", async (req, res) => {
   const title = req.params.title;
 
   try {
@@ -55,7 +77,7 @@ router.get("/book/title/:title", async (req, res) => {
   }
 });
 
-// Endpoint user creation: - CRUD: CREATE
+// Endpoint Book creation: - CRUD: CREATE
 router.post("/book", async (req, res) => {
   try {
     const book = new Book({
@@ -74,7 +96,7 @@ router.post("/book", async (req, res) => {
 // Book delete: - CRUD: DELETE
 router.delete("/:id", async (req, res) => {
   try {
-    // returns deleted user
+    // returns deleted Book
     const id = req.params.id;
     const bookDeleted = await Book.findByIdAndDelete(id);
     if (bookDeleted) {
