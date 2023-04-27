@@ -1,3 +1,5 @@
+// INDEX.JS - creates generic router
+
 // express req (npm i express)
 const express = require("express");
 const { bookRouter } = require("./routes/book.routes.js");
@@ -17,19 +19,28 @@ router.get("/", (req, res) => {
   res.send("Our API Homepage");
 });
 
+router.get("*", (req, res) => {
+  res.status(404).send("Sorry we couldn't find the page requested - (Error 404).");
+});
+
 // Using these routes:
-server.use("/", router);
+// ORDER IS IMPORTANT! - MOST RESTRICTIVE to LEAST.
+
 server.use("/book", bookRouter);
+server.use("/", router);
 server.listen(PORT, () => {
   console.log(`Server online using ${PORT}`);
 });
 
+// What is CRUD? =  Create.Read.Update.Delete
+
 /*
-TO DO:
-  -Refactor code 18.2 - video 1
+TO DO: ([-todo] [+complete])
+  +Refactor code 18.2.1
   -Use book API
     - extend to have complete CRUD
-    - create book
+    + create book
+    + read book database
     - update book
     - delete book
   - Move to POSTMAN

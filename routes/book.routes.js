@@ -1,14 +1,13 @@
 // express req (npm i express)
 const express = require("express");
-
 // Models
 const { Book } = require("../models/Book.js");
-
-// Routers - only for book
+// Routers - book only.
 const router = express.Router();
 
-// Routes
-// Home Route
+// ROUTES
+
+// Home Route: - CRUD: READ
 router.get("/", async (req, res) => {
   try {
     const books = await Book.find();
@@ -18,7 +17,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// search functionality
+// search functionality: - CRUD: READ
 router.get("/book", (req, res) => {
   Book.find()
     .then((books) => res.json(books))
@@ -39,7 +38,7 @@ router.get("/book/:id", (req, res) => {
     .catch((error) => res.status(500).json(error));
 });
 
-// search by title (or other parameter)
+// search by title (or other parameter): - CRUD: Custom Operation.
 router.get("/book/title/:title", async (req, res) => {
   const title = req.params.title;
 
@@ -56,7 +55,7 @@ router.get("/book/title/:title", async (req, res) => {
   }
 });
 
-// Endpoint user creation
+// Endpoint user creation: - CRUD: CREATE
 router.post("/book", async (req, res) => {
   try {
     const book = new Book({
@@ -67,6 +66,40 @@ router.post("/book", async (req, res) => {
 
     const createdBook = await book.save();
     return res.status(201).json(createdBook);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+// Book delete: - CRUD: DELETE
+router.delete("/:id", async (req, res) => {
+  try {
+    // returns deleted user
+    const id = req.params.id;
+    const bookDeleted = await Book.findByIdAndDelete(id);
+    if (bookDeleted) {
+      res.json(bookDeleted);
+    } else {
+      res.status(404).json({});
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+// Book update: - CRUD: UPDATE
+// (req.body) is an object with all info to be updated.
+// { new: true } - is a parameter that will return "new updated database entry"
+router.put("/:id", async (req, res) => {
+  try {
+    // returns deleted book
+    const id = req.params.id;
+    const bookUpdated = await Book.findByIdAndUpdate(id.req.body, { new: true });
+    if (bookUpdated) {
+      res.json(bookUpdated);
+    } else {
+      res.status(404).json({});
+    }
   } catch (error) {
     res.status(500).json(error);
   }
