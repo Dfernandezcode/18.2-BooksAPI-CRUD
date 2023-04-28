@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 const { connect } = require("../db.js");
 const { Book } = require("../models/Book.js");
-// const faker = require("@faker-js/faker");
+// const { faker } = require("@faker-js/faker");
 
 const bookList = [
   {
